@@ -4,6 +4,9 @@
 #include <EEPROM.h>
  
 //Variables
+int BUTTON_CLEAR = D1;
+int LED_CLEAR_INDICATOR = D2;
+int buttonState = 0;
 int i = 0;
 int statusCode;
 const char* ssid = "text";
@@ -30,6 +33,12 @@ void setup()
   EEPROM.begin(512); //Initialasing EEPROM
   delay(10);
   pinMode(LED_BUILTIN, OUTPUT);
+
+  //Setup for Clear EEPROM
+  pinMode(BUTTON_CLEAR, INPUT);
+  pinMode(LED_CLEAR_INDICATOR, OUTPUT);
+  digitalWrite(LED_CLEAR_INDICATOR, HIGH);
+
   Serial.println();
   Serial.println();
   Serial.println("Startup");
@@ -89,6 +98,13 @@ void setup()
 void loop() {
   if ((WiFi.status() == WL_CONNECTED))
   {
+    buttonState = digitalRead(BUTTON_CLEAR);
+    if (buttonState == LOW) {
+      digitalWrite(LED_CLEAR_INDICATOR, LOW);
+      Serial.println("Button is pressed");  
+      delay(100);
+      digitalWrite(LED_CLEAR_INDICATOR, HIGH);
+    }
  
     for (int i = 0; i < 10; i++)
     {
@@ -103,6 +119,15 @@ void loop() {
   {
   }
  
+}
+
+void clearEEPROM() {
+  // write a 0 to all 512 bytes of the EEPROM
+  for (int i = 0; i < 512; i++) {
+    EEPROM.write(i, 0);
+  }
+  EEPROM.end();
+  ESP.reset();
 }
  
  

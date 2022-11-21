@@ -37,17 +37,11 @@ void setup()
   //Setup for Clear EEPROM
   pinMode(BUTTON_CLEAR, INPUT);
   pinMode(LED_CLEAR_INDICATOR, OUTPUT);
-  digitalWrite(LED_CLEAR_INDICATOR, HIGH);
+  digitalWrite(LED_CLEAR_INDICATOR, LOW);
 
   Serial.println();
   Serial.println();
   Serial.println("Startup");
-  //---------------------------------------- clear EEPROM for SSID and pass
-  // String esid;
-  // String epass = "";
-  // for (int i = 0; i < 512; i++) {
-  //   EEPROM.write(i, 0);
-  // }
  
   //---------------------------------------- Read EEPROM for SSID and pass
   Serial.println("Reading EEPROM ssid");
@@ -99,26 +93,23 @@ void loop() {
   if ((WiFi.status() == WL_CONNECTED))
   {
     buttonState = digitalRead(BUTTON_CLEAR);
-    if (buttonState == LOW) {
-      digitalWrite(LED_CLEAR_INDICATOR, LOW);
-      Serial.println("Button is pressed");  
-      delay(100);
+    if (buttonState == HIGH) {
       digitalWrite(LED_CLEAR_INDICATOR, HIGH);
-    }
- 
-    for (int i = 0; i < 10; i++)
-    {
+      Serial.println("Clear EEPROM");
+      delay(500);
+      digitalWrite(LED_CLEAR_INDICATOR, LOW);
+      clearEEPROM();
+    } else {
+      digitalWrite(LED_CLEAR_INDICATOR, LOW);
       digitalWrite(LED_BUILTIN, HIGH);
       delay(1000);
       digitalWrite(LED_BUILTIN, LOW);
       delay(1000);
     }
- 
   }
   else
   {
   }
- 
 }
 
 void clearEEPROM() {

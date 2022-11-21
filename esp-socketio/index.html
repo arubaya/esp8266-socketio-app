@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      body {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      input {
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 4px 7px;
+        border: 1px solid #56718d;
+      }
+
+      .card {
+        min-width: 270px;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 7px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-padding {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+
+      .card-header {
+        background-color: #56718d;
+        width: 100%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        color: #fff;
+        border-radius: 7px 7px 0 0;
+      }
+
+      .card-header > p {
+        font-weight: 600;
+      }
+
+      .card-body {
+        padding-top: 10px;
+        padding-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-body > p,
+      label {
+        font-size: 12px;
+      }
+
+      .form-scan {
+        margin-top: 10px;
+      }
+
+      .list-ssid {
+        margin-top: 10px;
+      }
+      .list-ssid-ol {
+        padding-left: 20px;
+      }
+
+      .list-ssid-ol > li {
+        font-weight: 400;
+        font-size: 12px;
+      }
+
+      .form-connect {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+      }
+      .form-connect > input {
+        margin-top: 5px;
+      }
+      .form-connect > label {
+        margin-top: 5px;
+      }
+    </style>
+    <title>ESP8266 Access Point</title>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-padding card-header">
+        <p>ESP8266 Connect to Wifi</p>
+      </div>
+      <div class="card-padding card-body">
+        <p>Connect to: 192.168.4.1 for setup</p>
+        <form class="form-scan" action="/scan" method="POST">
+          <input type="submit" value="scan" />
+        </form>
+        <p class="list-ssid">SSID list:</p>
+        <ol class="list-ssid-ol">
+          <li>asdsad</li>
+          <li>asdsad</li>
+          <li>asdsad</li>
+        </ol>
+        <form class="form-connect" method="get" action="setting">
+          <label>SSID: </label>
+          <input name="ssid" length="32" />
+          <label>Pass: </label>
+          <input name="pass" length="64" />
+          <input type="submit" />
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

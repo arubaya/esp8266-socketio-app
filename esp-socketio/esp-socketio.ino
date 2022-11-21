@@ -5,7 +5,7 @@
 
 #define USER_SERIAL Serial
 
-const char *ssid = "Doomla";
+const char *ssid = "RUN System Office V";
 const char *pass = "12345678";
 
 int button = 5;

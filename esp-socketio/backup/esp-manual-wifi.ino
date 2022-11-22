@@ -1,17 +1,11 @@
-#include <Arduino.h>
-#include <SocketIoClient.h>
 #include <ESP8266WiFi.h>
-#include <ArduinoJson.h>
-
-// Manual wifi
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
-
+ 
 //Variables
 int BUTTON_CLEAR = D1;
 int LED_CLEAR_INDICATOR = D2;
-int LED = D7;
 int buttonState = 0;
 int i = 0;
 int statusCode;
@@ -19,21 +13,19 @@ const char* ssid = "text";
 const char* passphrase = "text";
 String st;
 String content;
-
-int status = false; // to trigger led high or low
-char toEmit[5];     // to emit to server; hold status to be converted from int to char
-
-SocketIoClient webSocket;
+ 
+ 
 //Function Decalration
 bool testWifi(void);
 void launchWeb(void);
 void setupAP(void);
-
+ 
 //Establishing Local server at port 80 whenever required
 ESP8266WebServer server(80);
-
+ 
 void setup()
 {
+ 
   Serial.begin(115200); //Initialising if(DEBUG)Serial Monitor
   Serial.println();
   Serial.println("Disconnecting previously connected WiFi");
@@ -45,7 +37,6 @@ void setup()
   //Setup for Clear EEPROM
   pinMode(BUTTON_CLEAR, INPUT);
   pinMode(LED_CLEAR_INDICATOR, OUTPUT);
-    pinMode(LED, OUTPUT);
   digitalWrite(LED_CLEAR_INDICATOR, LOW);
 
   Serial.println();
@@ -72,41 +63,12 @@ void setup()
   }
   Serial.print("PASS: ");
   Serial.println(epass);
-
-  String ewebsocket = "";
-  for (int i = 96; i < 111; ++i)
-  {
-    ewebsocket += char(EEPROM.read(i));
-  }
-  Serial.print("Websocket server: ");
-  Serial.println(ewebsocket);
-
-  String ewebsocketport = "";
-  for (int i = 111; i < 115; ++i)
-  {
-    ewebsocketport += char(EEPROM.read(i));
-  }
-  Serial.print("websocket port: ");
-  Serial.println(ewebsocketport);
  
  
   WiFi.begin(esid.c_str(), epass.c_str());
   if (testWifi())
   {
     Serial.println("Succesfully Connected!!!");
-    Serial.println("Connect to websocket server...");
-    // uncomment for your environment
-    // this is for local dev
-    webSocket.begin("10.13.20.22", 3000);
-    // webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
-
-    // for prod; not working with https?
-    //  webSocket.begin("socket-api.rltech.xyz");
-
-    webSocket.on("broadcast-new-user", printToSerial);
-
-    webSocket.on("led-status-message", printToSerial);
-    webSocket.on("led-status", controlled);
     return;
   }
   else
@@ -122,19 +84,12 @@ void setup()
   while ((WiFi.status() != WL_CONNECTED))
   {
     Serial.print(".");
-    digitalWrite(LED_BUILTIN, HIGH);
-      delay(100);
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(100);
+    delay(100);
     server.handleClient();
   }
-
+ 
 }
-
-void loop()
-{
-  webSocket.loop();
-
+void loop() {
   if ((WiFi.status() == WL_CONNECTED))
   {
     buttonState = digitalRead(BUTTON_CLEAR);
@@ -146,6 +101,10 @@ void loop()
       clearEEPROM();
     } else {
       digitalWrite(LED_CLEAR_INDICATOR, LOW);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(1000);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(1000);
     }
   }
   else
@@ -153,69 +112,6 @@ void loop()
   }
 }
 
-void printToSerial(const char *message, size_t length)
-{
-  pinMode(LED_BUILTIN, HIGH);
-  Serial.println(message);
-  delay(500);
-  pinMode(LED_BUILTIN, LOW);
-}
-
-// return status
-void returnStatus(const char *message, size_t length)
-{
-  // emit to server what is the status always
-  webSocket.emit("manual", itoa(status, toEmit, 5));
-}
-
-// when controlled using the web/mobile app
-void controlled(const char *message, size_t length)
-{
-    
-
-  DynamicJsonDocument doc(1024);
-  deserializeJson(doc, message);
-
-  short val = doc["status"];
-  const char* valChar = message;
-  //status = !status; // negate
-  Serial.println(val);
-//  digitalWrite(LED, LOW);
-
-  if (val == 1)
-  {
-    digitalWrite(LED, LOW); // then on off led
-  }
-  else
-  {
-    digitalWrite(LED, HIGH); // then on off led
-  }
-}
-
-// when controlled manually by button
-// void controlledButton(const char *message, size_t length)
-// {
-//   //  Serial.println(message);
-
-//   DynamicJsonDocument doc(1024);
-//   deserializeJson(doc, message);
-
-//   // emit to server
-//   webSocket.emit("logs");
-
-//   short val = doc["value"];
-//   if (val == 1)
-//   {
-//     digitalWrite(led, HIGH); // then on off led
-//   }
-//   else
-//   {
-//     digitalWrite(led, LOW); // then on off led
-//   }
-// }
-
-
-//-----------------------------------------------------------
 void clearEEPROM() {
   // write a 0 to all 512 bytes of the EEPROM
   for (int i = 0; i < 512; i++) {
@@ -339,7 +235,7 @@ void createWebServer()
       content += "<form class=\"form-scan\" action=\"/scan\" method=\"POST\"> <input type=\"submit\" value=\"scan\" /> </form>";
       content += "<p class=\"list-ssid\">SSID list:</p>";
       content += st;
-      content += "<form class=\"form-connect\" method=\"get\" action=\"setting\"> <label>SSID: </label> <input name=\"ssid\" length=\"32\" /> <label>Pass: </label> <input name=\"pass\" length=\"64\" /> <label>Websocket Server: </label> <input name=\"ws\" length=\"15\" /> <label>Websocket Port: </label> <input name=\"port\" length=\"4\" /> <input type=\"submit\" /> </form>";
+      content += "<form class=\"form-connect\" method=\"get\" action=\"setting\"> <label>SSID: </label> <input name=\"ssid\" length=\"32\" /> <label>Pass: </label> <input name=\"pass\" length=\"64\" /> <input type=\"submit\" /> </form>";
       content += "</div>";
       content += "</div></body>";
       content += "</html>";
@@ -357,20 +253,14 @@ void createWebServer()
     server.on("/setting", []() {
       String qsid = server.arg("ssid");
       String qpass = server.arg("pass");
-      String qws = server.arg("ws");
-      String qport = server.arg("port");
       if (qsid.length() > 0 && qpass.length() > 0) {
         Serial.println("clearing eeprom");
-        for (int i = 0; i < 512; i++) {
+        for (int i = 0; i < 96; ++i) {
           EEPROM.write(i, 0);
-        };
+        }
         Serial.println(qsid);
         Serial.println("");
         Serial.println(qpass);
-        Serial.println("");
-        Serial.println(qws);
-        Serial.println("");
-        Serial.println(qport);
         Serial.println("");
  
         Serial.println("writing eeprom ssid:");
@@ -386,20 +276,6 @@ void createWebServer()
           EEPROM.write(32 + i, qpass[i]);
           Serial.print("Wrote: ");
           Serial.println(qpass[i]);
-        }
-        Serial.println("writing eeprom ws server:");
-        for (int i = 0; i < qws.length(); ++i)
-        {
-          EEPROM.write(96 + i, qws[i]);
-          Serial.print("Wrote: ");
-          Serial.println(qws[i]);
-        }
-        Serial.println("writing eeprom ws port:");
-        for (int i = 0; i < qport.length(); ++i)
-        {
-          EEPROM.write(111 + i, qport[i]);
-          Serial.print("Wrote: ");
-          Serial.println(qport[i]);
         }
         EEPROM.commit();
  
@@ -417,4 +293,3 @@ void createWebServer()
     });
   } 
 }
-

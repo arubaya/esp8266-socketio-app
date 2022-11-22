@@ -6,7 +6,7 @@
 #define USER_SERIAL Serial
 
 const char *ssid = "RUN System Office V";
-const char *pass = "12345678";
+const char *pass = "RunsystemUSD1B";
 
 int button = 5;
 int led = 4;
@@ -27,7 +27,7 @@ void setup()
 
   // uncomment for your environment
   // this is for local dev
-  webSocket.begin("192.168.43.10", 3000);
+  webSocket.begin("10.13.20.22", 3000);
 
   // for prod; not working with https?
   //  webSocket.begin("socket-api.rltech.xyz");

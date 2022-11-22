@@ -74,7 +74,7 @@ void setup()
   Serial.println(epass);
 
   String ewebsocket = "";
-  for (int i = 96; i < 111; ++i)
+  for (int i = 96; i < 160; ++i)
   {
     ewebsocket += char(EEPROM.read(i));
   }
@@ -82,7 +82,7 @@ void setup()
   Serial.println(ewebsocket);
 
   String ewebsocketport = "";
-  for (int i = 111; i < 115; ++i)
+  for (int i = 160; i < 164; ++i)
   {
     ewebsocketport += char(EEPROM.read(i));
   }
@@ -97,8 +97,8 @@ void setup()
     Serial.println("Connect to websocket server...");
     // uncomment for your environment
     // this is for local dev
-    webSocket.begin("10.13.20.22", 3000);
-    // webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
+//    webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
+webSocket.beginSSL("esp8266-ws.up.railway.app");
 
     // for prod; not working with https?
     //  webSocket.begin("socket-api.rltech.xyz");
@@ -184,11 +184,11 @@ void controlled(const char *message, size_t length)
 
   if (val == 1)
   {
-    digitalWrite(LED, LOW); // then on off led
+    digitalWrite(LED, HIGH); // then on off led
   }
   else
   {
-    digitalWrite(LED, HIGH); // then on off led
+    digitalWrite(LED, LOW); // then on off led
   }
 }
 
@@ -339,7 +339,7 @@ void createWebServer()
       content += "<form class=\"form-scan\" action=\"/scan\" method=\"POST\"> <input type=\"submit\" value=\"scan\" /> </form>";
       content += "<p class=\"list-ssid\">SSID list:</p>";
       content += st;
-      content += "<form class=\"form-connect\" method=\"get\" action=\"setting\"> <label>SSID: </label> <input name=\"ssid\" length=\"32\" /> <label>Pass: </label> <input name=\"pass\" length=\"64\" /> <label>Websocket Server: </label> <input name=\"ws\" length=\"15\" /> <label>Websocket Port: </label> <input name=\"port\" length=\"4\" /> <input type=\"submit\" /> </form>";
+      content += "<form class=\"form-connect\" method=\"get\" action=\"setting\"> <label>SSID: </label> <input name=\"ssid\" length=\"32\" /> <label>Pass: </label> <input name=\"pass\" length=\"64\" /> <label>Websocket Server: </label> <input name=\"ws\" length=\"64\" /> <label>Websocket Port: </label> <input name=\"port\" length=\"4\" /> <input type=\"submit\" /> </form>";
       content += "</div>";
       content += "</div></body>";
       content += "</html>";
@@ -397,7 +397,7 @@ void createWebServer()
         Serial.println("writing eeprom ws port:");
         for (int i = 0; i < qport.length(); ++i)
         {
-          EEPROM.write(111 + i, qport[i]);
+          EEPROM.write(160 + i, qport[i]);
           Serial.print("Wrote: ");
           Serial.println(qport[i]);
         }
@@ -417,4 +417,3 @@ void createWebServer()
     });
   } 
 }
-

@@ -8,6 +8,9 @@ export default function SocketHandler(req: any, res: any) {
     console.log('Socket is initializing');
     const io = new Server(res.socket.server, {
       allowEIO3: true,
+      cors: {
+        origin: '*',
+      },
     });
     res.socket.server.io = io;
 

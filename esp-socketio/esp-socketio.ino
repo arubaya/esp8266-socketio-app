@@ -97,8 +97,15 @@ void setup()
     Serial.println("Connect to websocket server...");
     // uncomment for your environment
     // this is for local dev
-//    webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
-webSocket.beginSSL("esp8266-ws.up.railway.app");
+    if (ewebsocketport.toInt() == 0) {
+      Serial.println(ewebsocket.c_str());
+      webSocket.begin(ewebsocket.c_str());
+    } else {
+      Serial.print(ewebsocket.c_str());
+      Serial.print(":");
+      Serial.println(ewebsocketport.toInt());
+      webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
+    }
 
     // for prod; not working with https?
     //  webSocket.begin("socket-api.rltech.xyz");

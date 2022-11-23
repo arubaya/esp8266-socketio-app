@@ -104,13 +104,13 @@ void setup()
     if (ewebsocketport.toInt() == 0) {
       Serial.println(ewebsocket.c_str());
       testAccessHost(ewebsocket.c_str());
-      webSocket.begin(ewebsocket.c_str());
+      webSocket.beginSocketIOSSL(ewebsocket.c_str(), 443, "/socket.io/?EIO=4");
     } else {
       Serial.print(ewebsocket.c_str());
       Serial.print(":");
       Serial.println(ewebsocketport.toInt());
       testAccessHost(ewebsocket.c_str());
-      webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
+      webSocket.beginSocketIO(ewebsocket.c_str(), ewebsocketport.toInt());
     }
 
     // for prod; not working with https?

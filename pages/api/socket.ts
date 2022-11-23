@@ -10,7 +10,9 @@ export default function SocketHandler(req: any, res: any) {
       allowEIO3: true,
       cors: {
         origin: '*',
+        methods: ['GET', 'POST'],
       },
+      transports: ['websocket', 'polling'],
     });
     res.socket.server.io = io;
 

@@ -8,6 +8,10 @@
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
 
+// For test host
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+
 //Variables
 int BUTTON_CLEAR = D1;
 int LED_CLEAR_INDICATOR = D2;
@@ -45,7 +49,7 @@ void setup()
   //Setup for Clear EEPROM
   pinMode(BUTTON_CLEAR, INPUT);
   pinMode(LED_CLEAR_INDICATOR, OUTPUT);
-    pinMode(LED, OUTPUT);
+  pinMode(LED, OUTPUT);
   digitalWrite(LED_CLEAR_INDICATOR, LOW);
 
   Serial.println();
@@ -99,11 +103,13 @@ void setup()
     // this is for local dev
     if (ewebsocketport.toInt() == 0) {
       Serial.println(ewebsocket.c_str());
+      testAccessHost(ewebsocket.c_str());
       webSocket.begin(ewebsocket.c_str());
     } else {
       Serial.print(ewebsocket.c_str());
       Serial.print(":");
       Serial.println(ewebsocketport.toInt());
+      testAccessHost(ewebsocket.c_str());
       webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
     }
 
@@ -158,6 +164,40 @@ void loop()
   else
   {
   }
+}
+
+void testAccessHost(const String &host) {
+  WiFiClient client;
+
+    HTTPClient http;
+
+    Serial.print("[HTTP] begin...\n");
+    Serial.println(host);
+    if (http.begin(client, "http://" + host)) {  // HTTP
+
+
+      Serial.print("[HTTP] GET...\n");
+      // start connection and send HTTP header
+      int httpCode = http.GET();
+
+      // httpCode will be negative on error
+      if (httpCode > 0) {
+        // HTTP header has been send and Server response header has been handled
+        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+
+        // file found at server
+        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+          String payload = http.getString();
+          Serial.println(payload); 
+        }
+      } else {
+        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      }
+
+      http.end();
+    } else {
+      Serial.printf("[HTTP} Unable to connect\n");
+    }
 }
 
 void printToSerial(const char *message, size_t length)

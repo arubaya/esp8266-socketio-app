@@ -10,14 +10,12 @@ export default function SocketHandler(req: any, res: any) {
       allowEIO3: true,
       cors: {
         origin: '*',
-        methods: ['GET', 'POST'],
       },
-      transports: ['websocket', 'polling'],
     });
     res.socket.server.io = io;
 
     io.on('connection', (socket) => {
-      console.log(`new user: ${socket.id}`);
+      console.log(`new user: ${socket.id} Origin: ${socket.handshake.headers}`);
       socket.on('new-user', (message) => {
         console.log(message);
         socket.broadcast.emit(

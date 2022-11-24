@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <SocketIoClient.h>
+#include "SocketioClient.h"
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
 
@@ -7,10 +7,6 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <EEPROM.h>
-
-// For test host
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
 
 //Variables
 int BUTTON_CLEAR = D1;
@@ -27,7 +23,7 @@ String content;
 int status = false; // to trigger led high or low
 char toEmit[5];     // to emit to server; hold status to be converted from int to char
 
-SocketIoClient webSocket;
+SocketioClient webSocket;
 //Function Decalration
 bool testWifi(void);
 void launchWeb(void);
@@ -103,14 +99,12 @@ void setup()
     // this is for local dev
     if (ewebsocketport.toInt() == 0) {
       Serial.println(ewebsocket.c_str());
-      testAccessHost(ewebsocket.c_str());
-      webSocket.beginSocketIOSSL(ewebsocket.c_str(), 443, "/socket.io/?EIO=4");
+      webSocket.beginSSL(ewebsocket.c_str(), 443);
     } else {
       Serial.print(ewebsocket.c_str());
       Serial.print(":");
       Serial.println(ewebsocketport.toInt());
-      testAccessHost(ewebsocket.c_str());
-      webSocket.beginSocketIO(ewebsocket.c_str(), ewebsocketport.toInt());
+      webSocket.begin(ewebsocket.c_str(), ewebsocketport.toInt());
     }
 
     // for prod; not working with https?
@@ -166,40 +160,6 @@ void loop()
   }
 }
 
-void testAccessHost(const String &host) {
-  WiFiClient client;
-
-    HTTPClient http;
-
-    Serial.print("[HTTP] begin...\n");
-    Serial.println(host);
-    if (http.begin(client, "http://" + host)) {  // HTTP
-
-
-      Serial.print("[HTTP] GET...\n");
-      // start connection and send HTTP header
-      int httpCode = http.GET();
-
-      // httpCode will be negative on error
-      if (httpCode > 0) {
-        // HTTP header has been send and Server response header has been handled
-        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-
-        // file found at server
-        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-          String payload = http.getString();
-          Serial.println(payload); 
-        }
-      } else {
-        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-      }
-
-      http.end();
-    } else {
-      Serial.printf("[HTTP} Unable to connect\n");
-    }
-}
-
 void printToSerial(const char *message, size_t length)
 {
   pinMode(LED_BUILTIN, HIGH);
@@ -224,18 +184,15 @@ void controlled(const char *message, size_t length)
   deserializeJson(doc, message);
 
   short val = doc["status"];
-  const char* valChar = message;
-  //status = !status; // negate
-  Serial.println(val);
-//  digitalWrite(LED, LOW);
-
   if (val == 1)
   {
     digitalWrite(LED, HIGH); // then on off led
+    webSocket.emit("client-message", "LED Client: ON");
   }
   else
   {
     digitalWrite(LED, LOW); // then on off led
+    webSocket.emit("client-message", "LED Client: OFF");
   }
 }
 

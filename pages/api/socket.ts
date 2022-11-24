@@ -34,6 +34,10 @@ export default function SocketHandler(req: any, res: any) {
           `LED status: ${data.status === 1 ? 'ON' : 'OFF'}`
         );
       });
+
+      socket.on('client-message', (data) => {
+        console.log(data);
+      });
     });
     res.end();
   }

@@ -60,16 +60,24 @@ void SocketioClient::on(const char* event, std::function<void (const char * payl
 }
 
 void SocketioClient::emit(const char* event, const char * payload) {
-	String msg = String("42[\"");
-	msg += event;
-	msg += "\"";
-	if(payload) {
-		msg += ",";
-		msg += payload;
-	}
-	msg += "]";
-	Serial.printf("[SIoC] add packet %s\n", msg.c_str());
-	_packets.push_back(msg);
+
+	// creat JSON message for Socket.IO (event)
+  DynamicJsonDocument doc(1024);
+  JsonArray array = doc.to<JsonArray>();
+	String eventName = String(event);
+	// String eventPayload = String(payload);
+	array.add(eventName);
+	array.add(payload);
+  // JSON to String (serializion)
+  String output;
+  serializeJson(doc, output);
+  // Send event
+  _socketIO.sendEVENT(output);
+	Serial.printf("[SIoC] emit event %s\n", output.c_str());
+  // Print JSON for debugging
+  // Serial.println(output);
+
+	// _packets.push_back(msg);
 }
 
 void SocketioClient::trigger(const char* event, const char * payload, size_t length) {

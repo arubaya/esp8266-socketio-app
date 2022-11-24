@@ -2,6 +2,7 @@
 #define __SOCKETIOCLIENT_H__
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <map>
 #include <vector>
 #include <WebSocketsClient.h>

@@ -178,22 +178,28 @@ void returnStatus(const char *message, size_t length)
 // when controlled using the web/mobile app
 void controlled(const char *message, size_t length)
 {
-    
-
   DynamicJsonDocument doc(1024);
   deserializeJson(doc, message);
+  String status;
+
 
   short val = doc["status"];
   if (val == 1)
   {
     digitalWrite(LED, HIGH); // then on off led
-    webSocket.emit("client-message", "LED Client: ON");
+    status = "hidup";
   }
   else
   {
     digitalWrite(LED, LOW); // then on off led
-    webSocket.emit("client-message", "LED Client: OFF");
+    status = "mati";
   }
+
+  JsonObject object = doc.to<JsonObject>();
+  object["message"] = "Led dari client " + status;
+  String data;
+  serializeJson(doc, data);
+  webSocket.emit("client-message", data.c_str());
 }
 
 // when controlled manually by button
